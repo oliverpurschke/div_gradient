@@ -10,6 +10,11 @@ print('Filtering and cleaning empirical data, ...')
 
 shrtnames = as.character(as.matrix(read.table('./data/shrtnames.txt')))
 
+
+
+# bci ---------------------------------------------------------------------
+
+
 if ('bci' %in% shrtnames) {
     dat = read.table('./data/bci_census7.txt', sep='\t', header=TRUE)
   
@@ -22,7 +27,8 @@ if ('bci' %in% shrtnames) {
     write.csv(dat, file='./data/filtered_data/bci_census7_filtered.csv', row.names=F)
 }
 
-#  ------------------------------------------------------------------------
+
+# scbi --------------------------------------------------------------------
 
 if ('scbi' %in% shrtnames) {
     fileprefix = 'SCBI_initial_woody_stem_census_2012'
@@ -45,6 +51,25 @@ if ('scbi' %in% shrtnames) {
               row.names=F)
 }
 
+
+
+# huss --------------------------------------------------------------------
+
+
+if ('huss' %in% shrtnames) {
+    fileprefix = '00_HUSS_TREE_2013'
+    dat = read.csv(paste('./data/', fileprefix, '.csv', sep=''), sep=';')
+
+    # fix typo
+    dat$SPECIES[dat$SPECIES == 'Bu'] = 'BU'
+    
+    good_data = dat$PROBLEM != 1 &       # drop 536 indiv
+                dat$SPECIES != '-1000'   # drop 2 indiv
+    dat = dat[good_data, ]
+    
+    write.csv(dat, file=paste('./data/', fileprefix, '_filtered.csv', sep=''), 
+              row.names=F)
+}
 
 
 #  ------------------------------------------------------------------------
