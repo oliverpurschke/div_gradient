@@ -11,18 +11,43 @@ print('Filtering and cleaning empirical data, ...')
 shrtnames = as.character(as.matrix(read.table('./data/shrtnames.txt')))
 
 if ('bci' %in% shrtnames) {
-  dat = read.table('./data/raw_data/bci_census7.txt', sep='\t', header=TRUE)
+    dat = read.table('./data/bci_census7.txt', sep='\t', header=TRUE)
   
-  goodData = dat$Status=='alive' & !is.na(dat$DBH) & 
-             !is.na(dat$gx) & !is.na(dat$gy) & 
-             dat$Latin != 'Unidentified species' &
-             dat$Stem != 'secondary'
-  dat = dat[goodData ,]
+    good_data = dat$Status == 'alive' & !is.na(dat$DBH) & 
+                !is.na(dat$gx) & !is.na(dat$gy) & 
+                dat$Latin != 'Unidentified species' &
+                dat$Stem != 'secondary'
+    dat = dat[good_data, ]
   
-  write.csv(dat, file='./data/filtered_data/bci_census7_filtered.csv', row.names=F)
+    write.csv(dat, file='./data/filtered_data/bci_census7_filtered.csv', row.names=F)
 }
-##------------------------------------------------------------------------------
 
+#  ------------------------------------------------------------------------
+
+if ('scbi' %in% shrtnames) {
+    fileprefix = 'SCBI_initial_woody_stem_census_2012'
+    dat = read.csv(paste('./data/', fileprefix, '.csv', sep=''))
+    # lump all Crataegus
+    dat$Latin[dat$Latin == 'Crataegus pruinosa'] = 'Crataegus sp'
+    # 
+    good_data = dat$Status == 'alive' & !is.na(dat$DBH) & 
+                !is.na(dat$gx) & !is.na(dat$gy) & 
+                dat$Latin != 'Acer sp' &             # drop 1 indiv
+                dat$Latin != 'Carya sp' &            # drop 80 indiv
+                dat$Latin != 'Fraxinus sp' &         # drop 6 indiv
+                dat$Latin != 'Quercus sp' &          # drop 7 indiv
+                dat$Latin != 'Ulmus sp' &            # drop 95 indiv
+                dat$Latin != 'Unidentifed unknown' & # drop 692 indiv
+                dat$Stem != 'secondary'
+    dat = dat[good_data, ]
+    
+    write.csv(dat, file=paste('./data/', fileprefix, '_filtered.csv', sep=''), 
+              row.names=F)
+}
+
+
+
+#  ------------------------------------------------------------------------
 ## Purpose: to read in the .txt files of the cocoli censues and output a 
 ## cleaned .csv files that can then be used to perform calculations on. The
 ## filtering performed in this script is for a biodiversity analysis and may not
@@ -32,6 +57,7 @@ if ('bci' %in% shrtnames) {
 ## which is fairly close to the Cocoli plot except for two 40 m strips 
 ## Condit, R. et al. 2004. Tropical forest dynamics across a rainfall gradient
 ## and the impact of an El Nino dry season. Journal of Tropical Ecology, 20: 51-72.
+
 
 if ('cocoli' %in% shrtnames) {
   dat = read.table('./data/raw_data/cocoli.txt', header=TRUE)
