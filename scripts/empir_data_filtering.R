@@ -47,7 +47,7 @@ if ('scbi' %in% shrtnames) {
                 dat$Stem != 'secondary'
     dat = dat[good_data, ]
     
-    write.csv(dat, file=paste('./data/', fileprefix, '_filtered.csv', sep=''), 
+    write.csv(dat, file=paste('./data/filtered_data/', fileprefix, '_filtered.csv', sep=''), 
               row.names=F)
 }
 
@@ -67,7 +67,7 @@ if ('huss' %in% shrtnames) {
                 dat$SPECIES != '-1000'   # drop 2 indiv
     dat = dat[good_data, ]
     
-    write.csv(dat, file=paste('./data/', fileprefix, '_filtered.csv', sep=''), 
+    write.csv(dat, file=paste('./data/filtered_data/', fileprefix, '_filtered.csv', sep=''), 
               row.names=F)
 }
 
