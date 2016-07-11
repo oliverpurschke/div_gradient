@@ -6,4 +6,7 @@
 
 
 # filter raw data
-Rscript('./scripts/spat_empir_data_filering')
+Rscript('./scripts/empir_data_filering')
+
+# run analysis
+system('Rscript ./scripts/mobr_analysis.R', wait=F)
