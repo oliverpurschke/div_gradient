@@ -95,14 +95,6 @@ write.csv(dat, file=paste('./data/filtered_data/', fileprefix, '_filtered.csv', 
 
 
 # analysis ----------------------------------------------------------------
-
-sites = c('bci', 'scbi')
-dat = list()
-for(i in seq_along(sites)) {
-    dat[[i]] = read.csv(paste('./data/filtered_data/', dat_files[i], sep=''))
-}
-names(dat) = sites
-
 dat = list()
 dat$scbi = read.csv('./data/filtered_data/SCBI_initial_woody_stem_census_2012_filtered.csv')
 head(dat$scbi)
