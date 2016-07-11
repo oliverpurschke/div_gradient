@@ -1,5 +1,9 @@
 #library(mobr)
 source('./mobr/R/mobr.R')
+source('./scripts/div_functions.R')
+
+dir.create('./data/filtered_data')
+dir.create('./results')
 
 # data import ---------------------------------------------------------------
 
@@ -8,8 +12,6 @@ source('./mobr/R/mobr.R')
 ## performed in this script is for a biodiversity analysis and may not be
 ## appropriate for analyses targeted at other topics
 ## Metadata: ~/datasets/CTFSplots/BCI/bci50ha.doc 
-
-dir.create('./data/filtered_data')
 
 print('Filtering and cleaning empirical data, ...')
 
@@ -127,17 +129,15 @@ comms$scbi$comm = cbind(comms$scbi$comm,
                                nrow=nrow(comms$scbi$comm)))
 comm = rbind(comms$scbi$comm, comms$bci$comm)
 spat = rbind(comms$scbi$spat, comms$bci$spat)
-env = as.factor(rep(c('scbi', 'bci'), each=160))
+env = data.frame(group=as.factor(rep(c('scbi', 'bci'), each=160)))
 
 comm = make_comm_obj(comm, data.frame(group=env, x=spat[,1], y=spat[,2]))
-comm
-
-row.names(comm$comm) = 1:nrow(comm$comm)
-row.names(comm$env) = 1:nrow(comm$env)
 
 # not sure what is broken but
 names(comm$env) = 'groups'
 
 
-tst = get_delta_stats(comm, 'group', ref_group='bci', type='discrete', 
-                      log_scale=TRUE, inds = 10, nperm=10)
+tst = get_delta_stats(comm, 'groups', ref_group='bci', type='discrete', 
+                      log_scale=TRUE, inds = 10, nperm=1000)
+
+save(tst, file='./results/tst.Rdata')
