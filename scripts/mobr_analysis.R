@@ -104,8 +104,39 @@ index.descPROBLEM2 <- grep("BHD*", dat$descPROBLEM)
 index.descPROBLEM <- c(index.descPROBLEM1, index.descPROBLEM2)
 index.problem2 <- index.PROBLEM[(index.PROBLEM %in% index.descPROBLEM)==FALSE]
 
-dat.good <- dat[-index.problem2, c('SPECIES', 'EASTING_m', 'NORTHING_m')]
-names(dat.good) <- c('Latin', 'gx', 'gy')
+dat <- dat[-index.problem2, c('SPECIES', 'EASTING_m', 'NORTHING_m')]
+names(dat) <- c('Latin', 'gx', 'gy')
+
+range(dat$gx)
+range(dat$gy)
+
+# the huss plot is irregularily shaped -> find maximum rectangular extent
+
+# set new x and y columns for huss data:
+#plot(dat$gx, dat$gy)
+#identify(dat$gx, dat$gy, plot=TRUE)
+
+#xmin: 1550
+#xmax: 11965
+#ymin: 3580
+#ymax: 1550
+#dat[c(1550, 11965, 3580),]
+
+4391445-4390995
+5661862-5661438
+
+# maximum rectangular extent: 450 x 424 -> cut it to 440 x 400, to fit in 40m grid cells (see scbi & bci analysis):
+# To do:cut scbi and bci data to the same extent
+
+xmin = 4390995+5
+xmax = 4391445-5
+ymin = 5661438+12
+ymax = 5661862-12
+    
+dat = dat[dat$gx > xmin & dat$gx < xmax &
+          dat$gy > ymin & dat$gy < ymax, ]
+
+# plot(dat$gx, dat$gy)
 
 write.csv(dat.good, file=paste('./data/filtered_data/', fileprefix, '_filtered.csv', sep=''), row.names=F)
 
@@ -155,15 +186,18 @@ write.csv(gentry_clean, file='./data/filtered_data/gentry.csv',
 dat = list()
 dat$scbi = read.csv('./data/filtered_data/SCBI_initial_woody_stem_census_2012_filtered.csv')
 head(dat$scbi)
+
 dat$huss = read.csv('./data/filtered_data/00_HUSS_TREE_2013_filtered.csv')
 head(dat$huss)
 
-plot_size = c(40, 40)
-domain = c(0, 400, 0, 640)
+#########################################
 
+plot_size = c(40, 40)
+
+domain = c(0, 400, 0, 640)
 comms = list()
-comms$scbi = stems2comm(dat[[1]]$Latin, dat[[1]][ , c('gx', 'gy')], 
-                        plot_size, domain) 
+comms$scbi = stems2comm(dat[[1]]$Latin, dat[[1]][ , c('gx', 'gy')], plot_size, domain)
+
 domain = c(180, 820, 50, 450)
 comms$bci = stems2comm(dat[[2]]$Latin, dat[[2]][ , c('gx', 'gy')], 
                        plot_size, domain) 
