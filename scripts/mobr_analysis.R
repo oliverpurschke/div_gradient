@@ -79,6 +79,23 @@ dat = read.csv(paste('./data/', fileprefix, '.csv', sep=''), sep=';', stringsAsF
 
 # fix typo
 dat$SPECIES[which(dat$SPECIES %in% c("Bu"))] <- "BU"
+
+# give latin names to short names:
+dat$SPECIES[which(dat$SPECIES %in% c("AS"))] <- "Populus tremula"
+dat$SPECIES[which(dat$SPECIES %in% c("BAH"))] <- "Acer pseudoplatanus"
+dat$SPECIES[which(dat$SPECIES %in% c("BU"))] <- "Fagus sylvatica"
+dat$SPECIES[which(dat$SPECIES %in% c("BUL"))] <- "Ulmus glabra"
+dat$SPECIES[which(dat$SPECIES %in% c("EI"))] <- "Quercus sp." # likely "Quercus petraea"
+dat$SPECIES[which(dat$SPECIES %in% c("ES"))] <- "Fraxinus excelsior"
+dat$SPECIES[which(dat$SPECIES %in% c("FAH"))] <- "Acer campestre"
+dat$SPECIES[which(dat$SPECIES %in% c("HBU"))] <- "Carpinus betulus"
+dat$SPECIES[which(dat$SPECIES %in% c("HKB"))] <- "Lonicera sp."
+dat$SPECIES[which(dat$SPECIES %in% c("KB"))] <- "Prunus avium"
+dat$SPECIES[which(dat$SPECIES %in% c("LI"))] <- "Tilia sp." # likely "Tilia cordata"
+dat$SPECIES[which(dat$SPECIES %in% c("PF"))] <- "Euonymus europaeus"
+dat$SPECIES[which(dat$SPECIES %in% c("SAH"))] <- "Acer platanoides"
+dat$SPECIES[which(dat$SPECIES %in% c("WD"))] <- "Crataegus sp."
+
 # select potentially problematic entries: 
 index.PROBLEM <- which(dat$PROBLEM %in% c("1"))
 # select the ones that are not really a problem:
@@ -87,7 +104,8 @@ index.descPROBLEM2 <- grep("BHD*", dat$descPROBLEM)
 index.descPROBLEM <- c(index.descPROBLEM1, index.descPROBLEM2)
 index.problem2 <- index.PROBLEM[(index.PROBLEM %in% index.descPROBLEM)==FALSE]
 
-dat.good <- dat[-index.problem2,]
+dat.good <- dat[-index.problem2, c('SPECIES', 'EASTING_m', 'NORTHING_m')]
+names(dat.good) <- c('Latin', 'gx', 'gy')
 
 write.csv(dat.good, file=paste('./data/filtered_data/', fileprefix, '_filtered.csv', sep=''), row.names=F)
 
@@ -111,8 +129,7 @@ good_data = !is.na(cts$line) &
 cts = cts[good_data, ]
 
 #for only sites with 10 lines
-line_cts = tapply(cts$line, list(as.character(cts$site_code)), 
-                  function(x) length(unique(x)))
+line_cts = tapply(cts$line, list(as.character(cts$site_code)), function(x) length(unique(x)))
 gd_sites = names(line_cts[line_cts == 10])
 cts = cts[cts$site_code %in% gd_sites, ]
 
@@ -138,8 +155,8 @@ write.csv(gentry_clean, file='./data/filtered_data/gentry.csv',
 dat = list()
 dat$scbi = read.csv('./data/filtered_data/SCBI_initial_woody_stem_census_2012_filtered.csv')
 head(dat$scbi)
-dat$bci = read.csv('./data/filtered_data/bci_census7_filtered.csv')
-head(dat$bci)
+dat$huss = read.csv('./data/filtered_data/00_HUSS_TREE_2013_filtered.csv')
+head(dat$huss)
 
 plot_size = c(40, 40)
 domain = c(0, 400, 0, 640)
@@ -167,6 +184,6 @@ names(comm$env) = 'groups'
 
 
 tst = get_delta_stats(comm, 'groups', ref_group='bci', type='discrete', 
-                      log_scale=TRUE, inds = 10, nperm=1000)
+                      log_scale=TRUE, inds = 10, nperm=10)
 
 save(tst, file='./results/tst.Rdata')
