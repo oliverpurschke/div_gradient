@@ -75,17 +75,21 @@ write.csv(dat, file=paste('./data/filtered_data/', fileprefix, '_filtered.csv', 
 # huss --------------------------------------------------------------------
 
 fileprefix = '00_HUSS_TREE_2013'
-dat = read.csv(paste('./data/', fileprefix, '.csv', sep=''), sep=';')
+dat = read.csv(paste('./data/', fileprefix, '.csv', sep=''), sep=';', stringsAsFactors=FALSE)
 
 # fix typo
-dat$SPECIES[dat$SPECIES == 'Bu'] = 'BU'
+dat$SPECIES[which(dat$SPECIES %in% c("Bu"))] <- "BU"
+# select potentially problematic entries: 
+index.PROBLEM <- which(dat$PROBLEM %in% c("1"))
+# select the ones that are not really a problem:
+index.descPROBLEM1 <- grep("Gegenwinkel*", dat$descPROBLEM)
+index.descPROBLEM2 <- grep("BHD*", dat$descPROBLEM)
+index.descPROBLEM <- c(index.descPROBLEM1, index.descPROBLEM2)
+index.problem2 <- index.PROBLEM[(index.PROBLEM %in% index.descPROBLEM)==FALSE]
 
-good_data = dat$PROBLEM != 1 &       # drop 536 indiv
-  dat$SPECIES != '-1000'   # drop 2 indiv
-dat = dat[good_data, ]
+dat.good <- dat[-index.problem2,]
 
-write.csv(dat, file=paste('./data/filtered_data/', fileprefix, '_filtered.csv', sep=''), 
-          row.names=F)
+write.csv(dat.good, file=paste('./data/filtered_data/', fileprefix, '_filtered.csv', sep=''), row.names=F)
 
 
 # korup -------------------------------------------------------------------
