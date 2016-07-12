@@ -1,3 +1,5 @@
+library(maps)
+library(ecoretriever)
 #library(mobr)
 source('./mobr/R/mobr.R')
 source('./scripts/div_functions.R')
@@ -90,9 +92,43 @@ write.csv(dat, file=paste('./data/filtered_data/', fileprefix, '_filtered.csv', 
 
 
 
+# gentry ------------------------------------------------------------------
 
+dat = fetch('Gentry')
 
+# examine counts table 
+cts = dat$counts
 
+good_data = !is.na(cts$line) &
+            !is.na(cts$count) &
+            cts$line != 0 & 
+            cts$line != 11
+
+cts = cts[good_data, ]
+
+#for only sites with 10 lines
+line_cts = tapply(cts$line, list(as.character(cts$site_code)), 
+                  function(x) length(unique(x)))
+gd_sites = names(line_cts[line_cts == 10])
+cts = cts[cts$site_code %in% gd_sites, ]
+
+# filter site table down to only new world samples
+gd_contintents = c('North America', 'Mesoamerica', 'South America')
+env = gentry_env[gentry_env$continent %in% gd_contintents, ]
+# filter site table down to only samples in cts
+env = env[env$abbreviation %in% unique(cts$site_code), ]
+# filter cts table down to same set of sites
+row_indices = cts$site_code %in% env$abbreviation
+cts = cts[row_indices, ]
+
+gentry_clean = merge(cts, env, by.x='site_code', by.y='abbreviation',
+                     all=T)
+
+map('world')
+points(gentry_clean$lon, gentry_clean$lat, pch=1, col='red')
+
+write.csv(gentry_clean, file='./data/filtered_data/gentry.csv',
+          row.names=F)
 
 # analysis ----------------------------------------------------------------
 dat = list()
@@ -110,9 +146,6 @@ comms$scbi = stems2comm(dat[[1]]$Latin, dat[[1]][ , c('gx', 'gy')],
 domain = c(180, 820, 50, 450)
 comms$bci = stems2comm(dat[[2]]$Latin, dat[[2]][ , c('gx', 'gy')], 
                        plot_size, domain) 
-
-sapply(comms$scbi, head)
-sapply(comms$bci, head)
 
 # append data together into one matrix for analysis
 Spool_diff = ncol(comms$bci$comm) - ncol(comms$scbi$comm)
