@@ -1,0 +1,101 @@
+[1mdiff --git a/scripts/mobr_analysis.R b/scripts/mobr_analysis.R[m
+[1mindex cf746f0..f92a505 100644[m
+[1m--- a/scripts/mobr_analysis.R[m
+[1m+++ b/scripts/mobr_analysis.R[m
+[36m@@ -104,8 +104,39 @@[m [mindex.descPROBLEM2 <- grep("BHD*", dat$descPROBLEM)[m
+ index.descPROBLEM <- c(index.descPROBLEM1, index.descPROBLEM2)[m
+ index.problem2 <- index.PROBLEM[(index.PROBLEM %in% index.descPROBLEM)==FALSE][m
+ [m
+[31m-dat.good <- dat[-index.problem2, c('SPECIES', 'EASTING_m', 'NORTHING_m')][m
+[31m-names(dat.good) <- c('Latin', 'gx', 'gy')[m
+[32m+[m[32mdat <- dat[-index.problem2, c('SPECIES', 'EASTING_m', 'NORTHING_m')][m
+[32m+[m[32mnames(dat) <- c('Latin', 'gx', 'gy')[m
+[32m+[m
+[32m+[m[32mrange(dat$gx)[m
+[32m+[m[32mrange(dat$gy)[m
+[32m+[m
+[32m+[m[32m# the huss plot is irregularily shaped -> find maximum rectangular extent[m
+[32m+[m
+[32m+[m[32m# set new x and y columns for huss data:[m
+[32m+[m[32m#plot(dat$gx, dat$gy)[m
+[32m+[m[32m#identify(dat$gx, dat$gy, plot=TRUE)[m
+[32m+[m
+[32m+[m[32m#xmin: 1550[m
+[32m+[m[32m#xmax: 11965[m
+[32m+[m[32m#ymin: 3580[m
+[32m+[m[32m#ymax: 1550[m
+[32m+[m[32m#dat[c(1550, 11965, 3580),][m
+[32m+[m
+[32m+[m[32m4391445-4390995[m
+[32m+[m[32m5661862-5661438[m
+[32m+[m
+[32m+[m[32m# maximum rectangular extent: 450 x 424 -> cut it to 440 x 400, to fit in 40m grid cells (see scbi & bci analysis):[m
+[32m+[m[32m# To do:cut scbi and bci data to the same extent[m
+[32m+[m
+[32m+[m[32mxmin = 4390995+5[m
+[32m+[m[32mxmax = 4391445-5[m
+[32m+[m[32mymin = 5661438+12[m
+[32m+[m[32mymax = 5661862-12[m
+[32m+[m[41m    [m
+[32m+[m[32mdat = dat[dat$gx > xmin & dat$gx < xmax &[m
+[32m+[m[32m          dat$gy > ymin & dat$gy < ymax, ][m
+[32m+[m
+[32m+[m[32m# plot(dat$gx, dat$gy)[m
+ [m
+ write.csv(dat.good, file=paste('./data/filtered_data/', fileprefix, '_filtered.csv', sep=''), row.names=F)[m
+ [m
+[36m@@ -155,15 +186,51 @@[m [mwrite.csv(gentry_clean, file='./data/filtered_data/gentry.csv',[m
+ dat = list()[m
+ dat$scbi = read.csv('./data/filtered_data/SCBI_initial_woody_stem_census_2012_filtered.csv')[m
+ head(dat$scbi)[m
+[32m+[m
+ dat$huss = read.csv('./data/filtered_data/00_HUSS_TREE_2013_filtered.csv')[m
+ head(dat$huss)[m
+ [m
+[32m+[m[32m########################################[m
+[32m+[m[32m########################################[m
+[32m+[m[32mdat <- dat$huss[m
+[32m+[m[32mrange(dat$gx)[m
+[32m+[m[32mrange(dat$gy)[m
+[32m+[m
+[32m+[m[32m# set new x and y columns for huss data:[m
+[32m+[m[32m#plot(dat$gx, dat$gy)[m
+[32m+[m[32m#identify(dat$gx, dat$gy, plot=TRUE)[m
+[32m+[m
+[32m+[m[32m#xmin: 1550[m
+[32m+[m[32m#xmax: 11965[m
+[32m+[m[32m#ymin: 3580[m
+[32m+[m[32m#ymax: 1550[m
+[32m+[m[32m#dat[c(1550, 11965, 3580),][m
+[32m+[m
+[32m+[m[32m4391445-4390995[m
+[32m+[m[32m5661862-5661438[m
+[32m+[m[32m# maximum rectangular extent: 450 x 424 -> cut it to 440 x 400, to fit in 40m grid cells (see scbi & bci analysis):[m
+[32m+[m[32mxmin = 4390995+5[m
+[32m+[m[32mxmax = 4391445-5[m
+[32m+[m[32mymin = 5661438+12[m
+[32m+[m[32mymax = 5661862-12[m
+[32m+[m[41m    [m
+[32m+[m[32m######[m
+[32m+[m
+[32m+[m[32mdat = dat[dat$gx > xmin & dat$gx < xmax &[m
+[32m+[m[32m          dat$gy > ymin & dat$gy < ymax, ][m
+[32m+[m
+[32m+[m[32mplot(dat$gx, dat$gy)[m
+[32m+[m
+[32m+[m[32m#########################################[m
+[32m+[m[32m#########################################[m
+[32m+[m
+[32m+[m
+ plot_size = c(40, 40)[m
+[31m-domain = c(0, 400, 0, 640)[m
+ [m
+[32m+[m[32mdomain = c(0, 400, 0, 640)[m
+ comms = list()[m
+[31m-comms$scbi = stems2comm(dat[[1]]$Latin, dat[[1]][ , c('gx', 'gy')], [m
+[31m-                        plot_size, domain) [m
+[32m+[m[32mcomms$scbi = stems2comm(dat[[1]]$Latin, dat[[1]][ , c('gx', 'gy')], plot_size, domain)[m
+[32m+[m
+ domain = c(180, 820, 50, 450)[m
+ comms$bci = stems2comm(dat[[2]]$Latin, dat[[2]][ , c('gx', 'gy')], [m
+                        plot_size, domain) [m
